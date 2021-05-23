@@ -1,0 +1,34 @@
+
+Introduction
+============
+
+SCAP, (Single Cell Analysis Platform), is a mini version of single cell analysis pipeline, and designed for the wet-lab scientists.
+
+
+
+
+Requirements
+============
+
+1). Python 2, Python 2.7.x or newer 
+
+2). R version 2.15.1 or higher
+
+	- Rtsne
+	- DESeq2
+	- edgeR
+	- gplots
+	- plotrix
+
+
+
+
+How to run ?
+============
+
+To run SCAP, go to " %SCAP_HOME/bin/ " folder and double click "scap"
+
+or open the terminal, enter to the directory " %SCAP_HOME/bin/ " and type:
+
+python scap
+

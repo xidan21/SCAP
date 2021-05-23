@@ -1,0 +1,339 @@
+#!/usr/bin/env python 2.6
+
+import os
+import sys
+import subprocess
+import re
+
+from Tkinter import *
+from tkFileDialog import *
+
+class MyCode(object):
+	def __init__(self):
+		root = Tk()
+		root.title('welcome to use S.C.A.P!')
+		screen_width = root.winfo_screenwidth()
+		screen_height = root.winfo_screenheight() 
+		
+		x = (screen_width/2) - (855/2) 
+		y = (screen_height/2) - (900/2)
+		root.geometry('%dx%d+%d+%d' % (855, 700, x, y))
+		
+		self.species_name = StringVar()
+		self.inputfile_matrix = StringVar()
+		self.inputfile_title = StringVar()
+		self.inputfile_length = StringVar()
+		self.genes = StringVar()
+		self.variable = StringVar()
+
+#		self.variable.set("0")
+######################## title ############################
+
+		Label(root,width=10,text='S.C.A.P',fg='blue',font=("Helvetica", 56)).place(x=275,y=40)
+		Label(root,width=50,text='Single Cells Analysis Platform',fg='blue',font=("Helvetica", 16)).place(x=230,y=130)
+
+#########################load an entry####################      
+
+		Label(root,text='Please select the species name',fg='green').place(x=330,y=179)		
+		self.species_name.set("Human")
+	
+		OptionMenu(root,self.species_name,
+		"Human",
+		"Mouse",
+		"Rat"
+		).place(x = 375, y = 205)
+	
+		Label(root,text='Please upload your sequence matrix.',fg='green').place(x=315,y=240)
+       		self.e1 = Entry(root, width=18,textvariable=self.inputfile_matrix)
+       		self.e1.place(x=325,y=265)
+ 
+       		B = Button(root,text='Upload',command=self.Onload_1)
+        	B.place(x=505,y=265)
+
+                Label(root,text='Please upload your genes title file.',fg='green').place(x=315,y=295)
+                self.e2 = Entry(root, width=18,textvariable=self.inputfile_title)
+                self.e2.place(x=325,y=315)
+
+                B = Button(root,text='Upload',command=self.Onload_2)
+                B.place(x=505,y=315)
+
+
+                Label(root,text='Please upload your genes length file.',fg='green').place(x=315,y=350)
+                self.e3 = Entry(root, width=18,textvariable=self.inputfile_length)
+                self.e3.place(x=325,y=370)
+
+                B = Button(root,text='Upload',command=self.Onload_3)
+                B.place(x=505,y=370)
+
+
+		Label(root,text='Please input your marker genes into the box below',fg='green').place(x=271,y=400)
+                self.textfr(root)
+
+      
+#########################load run button##################
+
+		button = Button(root,text='RUN',fg='red',command=self.Run)
+		button.place(x=410,y=535)
+
+#########################upload image#####################     
+
+		image2 = PhotoImage(file="../figure/ki.gif")
+		panel_2 = Label(root, image=image2)      
+		panel_2.image = image2
+		panel_2.place(x=130,y=571)
+      
+		image3 = PhotoImage(file="../figure/az.gif")
+		panel_3 = Label(root, image=image3)      
+		panel_3.image = image3
+		panel_3.place(x=610,y=550)
+
+######################load menu bar#######################      
+
+		menubar = Menu(root)
+		filemenu = Menu(menubar)      
+		menubar.add_cascade(label='File', menu=filemenu)
+		filemenu.add_command(label='load...', command=self.Onload_1)
+		filemenu.add_command(label='open...', command=self.open_as)
+      
+		helpmenu = Menu(menubar)
+		menubar.add_cascade(label="Help", menu=helpmenu)
+		helpmenu.add_command(label="About...", command=self.create_a_child_window_for_readme)
+		filemenu.add_command(label='Exit', command=root.quit)      
+		root.config(menu=menubar)
+
+		#root.wm_attributes("-topmost", 1)
+
+		root.mainloop()
+      
+####################################################################################################   
+
+        def textfr(self,master):
+
+                textfr = Frame(master)
+                self.text = Text(textfr,height = 5,width = 50, borderwidth=2,relief = RIDGE)
+                scroll = Scrollbar(textfr)
+
+
+                self.text.configure(yscrollcommand = scroll.set)
+                self.text.pack(side = LEFT)
+                scroll.pack(side = RIGHT,fill = Y)
+
+                textfr.place(x=260, y=420)
+   
+        def Onload_1(self):
+		
+		self.e1.delete(0, END)
+
+		fileName = askopenfilename(filetypes=[("Text files", "*.txt"), ("SNPs files", "*.vcf"), ("Fasta files", "*.fa"), ("All Files","*.*")])
+		self.e1.insert(0, fileName)
+
+        def Onload_2(self):
+
+                self.e2.delete(0, END)
+
+                fileName = askopenfilename(filetypes=[("Text files", "*.txt"), ("SNPs files", "*.vcf"), ("Fasta files", "*.fa"), ("All Files","*.*")])
+                self.e2.insert(0, fileName)
+
+        def Onload_3(self):
+
+                self.e3.delete(0, END)
+
+                fileName = askopenfilename(filetypes=[("Text files", "*.txt"), ("SNPs files", "*.vcf"), ("Fasta files", "*.fa"), ("All Files","*.*")])
+                self.e3.insert(0, fileName)
+
+	def create_a_child_window_for_readme(self):
+        
+		# create the root window
+		root_3 = Tk()
+		text = Text(root_3)
+        
+		# modify the window
+		root_3.title("READ ME")
+		root_3.geometry("900x600")
+        
+		myTextWidget= Text(root_3) # set up a text widget as a root (window) child
+		scrollbar = Scrollbar(root_3)
+		scrollbar.pack(side = RIGHT,fill = Y)
+
+		myTextWidget.configure(yscrollcommand = scrollbar.set)
+	
+        
+		myFile= file("../README") # get a file handle
+		myText=myFile.read() # read the file to variable
+		myFile.close() # close file handle
+        
+		myTextWidget.insert(0.0,myText) # insert the file's text into the text widget
+        
+		myTextWidget.pack(expand=1, fill=BOTH) # show the widget
+
+		scrollbar.config(command=myTextWidget.yview)
+        
+		root_3.mainloop()
+    
+    	def create_a_child_window_for_result(self,filename):
+        
+		root_2 = Tk()
+		text = Text(root_2)
+        
+		root_2.title("RESULT")
+		root_2.geometry("900x600")
+        
+		myTextWidget= Text(root_2) # set up a text widget as a root (window) child
+
+		scrollbar = Scrollbar(root_2)
+		scrollbar.pack(side = RIGHT,fill = Y)
+
+		myTextWidget.configure(yscrollcommand = scrollbar.set)
+	
+		myFile=open(filename,'r') # get a file handle
+
+                myText= myFile.read() # read the file to variable
+                myFile.close() # close file handle
+
+                myTextWidget.insert(0.0,myText) # insert the file's text into the text widget
+
+                myTextWidget.pack(expand=1, fill=BOTH) # show the widget
+
+		scrollbar.config(command=myTextWidget.yview)
+	#	root_2.wm_attributes("-toolwindow")
+
+		self.create_a_child_window_for_ranking_result("../result/ranked_aa.txt")
+	
+		root_2.mainloop()
+			    
+
+
+	def create_a_child_window_for_selecting_parameter(self):
+		root_local = Tk()
+        
+		root_local.title('welcome to use S.C.A.P!')
+                screen_width = root_local.winfo_screenwidth()
+                screen_height = root_local.winfo_screenheight()
+
+                x = (screen_width/2) - (555/2)
+                y = (screen_height/2) - (500/2)
+                root_local.geometry('%dx%d+%d+%d' % (555, 400, x, y))
+
+#                self.windows_start  = StringVar()
+ #               self.windows_end    = StringVar()
+
+		######################## title ############################
+
+                Label(root_local,width=10,text='S.C.A.P',fg='blue',font=("Helvetica", 56)).place(x=125,y=40)
+                Label(root_local,width=50,text='Single Cells Analysis Platform',fg='blue',font=("Helvetica", 16)).place(x=80,y=125)
+
+                Label (root_local, text='Select from ',fg='green').place(x=171,y=165)
+                self.local_start = Entry (root_local, width=5)
+		self.local_start.pack()
+		self.local_start.place(x=175,y=195)
+
+                Label (root_local, text='Windows End ',fg='green').place(x=320,y=165)
+                self.local_end = Entry (root_local, width=5)
+		self.local_end.pack()
+		self.local_end.place(x=325,y=195)
+
+                Label (root_local, text='tSNE perplexity ',fg='green').place(x=85,y=225)
+                self.local_perplexity = Entry (root_local, width=5)
+                self.local_perplexity.pack()
+                self.local_perplexity.place(x=100,y=255)
+
+		Label (root_local, text='Top variable genes',fg='green').place(x=215,y=225)
+                self.variable = Entry (root_local, width=5)
+                self.variable.pack()
+                self.variable.place(x=244,y=255)
+
+                Label (root_local, text='clusters amount ',fg='green').place(x=365,y=225)
+                self.local_clusters = Entry (root_local, width=5)
+                self.local_clusters.pack()
+                self.local_clusters.place(x=385,y=255)
+
+
+
+                button_local = Button(root_local,text='RUN',fg="red",command=self.local_Run)
+                button_local.bind('<Return>',self.local_Run)
+                button_local.focus()
+
+		button_local.place(x=245,y=335)
+
+		print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+		
+		root_local.wm_attributes("-topmost", 1)		
+		root_local.mainloop()
+
+	def local_Run(self):
+
+		print self.local_start.get()
+		print self.local_end.get()
+		print self.local_perplexity.get()
+		print self.local_clusters.get()
+
+		os.system("python pipeline_2.py %s %s %s %s %s %s %s" %(self.species_name.get(), self.local_start.get(), self.local_end.get(), self.local_clusters.get(), self.local_perplexity.get(), "../source/seq.txt", self.variable.get()))
+
+   	def open_as(self):
+		fileName_2 = askopenfilename(filetypes=[("Text and Python files","*.fa *.txt *.py *.pyw"), 
+		     ("HTML files","*.html"), 
+		     ("All files","*.*")])
+		
+		try:
+		
+			self.create_a_child_window(fileName_2)
+		
+		except IOError:
+		
+			from tkMessageBox import showwarning
+			showwarning("Open", "Cannot open the file.")	
+			raise Cancel
+		 
+	def file_save(self):
+
+		fout = asksaveasfile(mode='w', defaultextension=".txt")
+		text2save = str(self.text.get(1.0,END))
+		fout.write(text2save)
+		fout.close()
+
+	
+	def Run(self):
+
+		os.system("rm ../source/seq.txt")
+		print
+		print "##############################################################################"
+		print "                           Welcome to using S.C.A.P!"
+		print "##############################################################################"
+		print 
+		print "your query species is %s" %self.species_name.get()
+		print
+		print "your upload matrix file name is %s" %self.inputfile_matrix.get()
+		print		
+		print "your upload gene title file name is %s" %self.inputfile_title.get()
+		print
+		print "your upload gene length file name is %s" %self.inputfile_length.get()
+		print
+		print "your inputting marker genes are %s" %self.text.get('1.0','end-1c')
+	
+		self.sequence = self.text.get('1.0','end-1c')
+	
+		out = open("../source/seq.txt",'w')
+#               out.write(">QUERY_SEQ")
+
+                print >> out, self.sequence
+
+                out.close()
+
+		os.system("rm ../result/*")
+
+		os.system("python pipeline.py %s %s %s" %(self.inputfile_matrix.get(), self.inputfile_title.get(), self.inputfile_length.get()))
+
+		self.create_a_child_window_for_selecting_parameter()
+
+		self.local_Run()
+
+
+		try:
+			self.create_a_child_window_for_result("../result/RPKM.txt")
+
+		except IOError as e:
+			print 'Oh dear.'
+ 
+if __name__=='__main__':    
+
+	myApp = MyCode()
